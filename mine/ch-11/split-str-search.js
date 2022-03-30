@@ -28,18 +28,23 @@ const halveStrArr = strArr => {
 // since I don't have to spend time to split the string and use the slice logic
 // for every recursion call which should save me some time complexity.
 const splitStrSearch = (str, q) => {
-	// The str that will be searched splitted into an array
-	const seperatedStr = str instanceof Array ? str : str.split(" ");
-
 	// The base case will be when the str is an empty array which means we don't have to match anything and just return 0
 	if (!str.length) {
 		return 0;
 	}
 
+	// The str that will be searched splitted into an array
+	const seperatedStr = str instanceof Array ? str : str.split(" ");
+
 	let matchCount = 0;
 	// The query being halved until it's no longer possible to halve it
 	let halvedQ = [q];
 	while (halvedQ) {
+		/*
+		DBG use this if you want to know the number of loops in while loop.
+		For comparisonal purpose only when comparing with memo version
+		*/
+		// console.log("In Non-Memo While");
 		// Match seperatedStr[0] (which is the only str value we need to care per recursion) againts each query
 		for (const query of halvedQ) {
 			seperatedStr[0].toLowerCase().includes(query.toLowerCase()) &&
@@ -54,14 +59,14 @@ const splitStrSearch = (str, q) => {
 	return matchCount + splitStrSearch(seperatedStr.slice(1), q);
 };
 
-console.log(
-	splitStrSearch("The hours beach house bloom", "Beach The Bloom Hours House")
-); // 8
+// console.log(
+// 	splitStrSearch("The hours beach house bloom", "Beach The Bloom Hours House")
+// ); // 8
 
-console.log(
-	splitStrSearch("The golden hours of Carcosa", "Beach The Bloom Hours House")
-); // 3
+// console.log(
+// 	splitStrSearch("The golden hours of Carcosa", "Beach The Bloom Hours House")
+// ); // 3
 
-console.log(splitStrSearch("The hours the", "the")); // 2
+// console.log(splitStrSearch("The hours the", "the")); // 2
 
 export default splitStrSearch;
