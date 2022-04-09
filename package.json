@@ -9,5 +9,8 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"eslint-plugin-jsdoc": "^39.0.1"
+	}
 }
