@@ -1,3 +1,9 @@
+/*
+
+THIS IS THE WRONG VERSION >:(
+
+*/
+
 import splitStrSearch from "../ch-11/split-str-search.js";
 
 const halveStr = str => {
@@ -11,16 +17,16 @@ const halveStr = str => {
 		];
 	}
 
-	return [str];
+	return [ str ];
 };
 
 // ["The hours", "Beach house"] => ["The", "hours", "Beach", "House"]
 const halveStrArr = strArr => {
 	const halvedStrArr = strArr.flatMap(str => halveStr(str));
 
-	return halvedStrArr.every((str, i) => str === strArr[i])
-		? false
-		: halvedStrArr;
+	return halvedStrArr.every((str, i) => str === strArr[i]) ?
+		false :
+		halvedStrArr;
 };
 
 // The memo version will only be very helpful if there are multiple of the same word,
@@ -46,7 +52,7 @@ const splitStrSearchMemo = (str, q, _memo = {}) => {
 	if (!(word in _memo)) {
 		let matchCount = 0;
 		// The query being halved until it's no longer possible to halve it
-		let halvedQ = [q];
+		let halvedQ = [ q ];
 		while (halvedQ) {
 			/*
 			DBG use this if you want to know the number of loops in while loop.
@@ -55,6 +61,10 @@ const splitStrSearchMemo = (str, q, _memo = {}) => {
 			// console.log("In Memo While");
 			// Match word (which is the only str value we need to care per recursion) againts each query
 			for (const query of halvedQ) {
+				// CMT The reason why i say this is the wrong version since this
+				// we don't actually have to halvedQ everytime, we can just seperate
+				// each Q into a single word and match that. Why? since word will
+				// always be a single word so it is unnecessary to match it with stuff like "meo meow"
 				word.includes(query.toLowerCase()) && matchCount++;
 			}
 
@@ -70,6 +80,8 @@ const splitStrSearchMemo = (str, q, _memo = {}) => {
 	// with the rest of the words matchCounts
 	return _memo[word] + splitStrSearchMemo(seperatedStr.slice(1), q, _memo);
 };
+
+// console.log(splitStrSearchMemo("The hours beach house, superSTAR", "superstar", { "superstar" : 1000 }));
 
 /* non memo vs memo */
 
