@@ -1,5 +1,10 @@
-const uniquePaths = (rows, cols, memo = { rows: {}, cols: {} }) => {
-	if (rows === 1 || cols === 1) return 1;
+const uniquePaths = (rows, cols, memo = {
+	rows : {},
+	cols : {}
+}) => {
+	if (rows === 1 || cols === 1) {
+		return 1;
+	}
 
 	if (!memo.rows[rows]) {
 		memo.rows[rows] = uniquePaths(rows - 1, cols, memo);
@@ -17,7 +22,9 @@ console.log(uniquePaths(4000, 700));
 console.timeEnd("Start");
 
 const uniquePathsStrTempLitVer = (rows, cols, memo = {}) => {
-	if (rows === 1 || cols === 1) return 1;
+	if (rows === 1 || cols === 1) {
+		return 1;
+	}
 
 	const key = `${rows}${cols}`;
 	if (!memo[key]) {
