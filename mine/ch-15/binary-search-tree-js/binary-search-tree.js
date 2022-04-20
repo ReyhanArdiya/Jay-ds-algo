@@ -43,7 +43,7 @@ class BinarySearchTree extends TreeNode {
 		return this.search(val, currentNode);
 	}
 
-	traverse(
+	traverseV1(
 		cb = node => console.log(node),
 		// Since the first currentNode is root, then automatically root will be the first previousVisited node
 		currentNode = this.#rootNode,
@@ -137,7 +137,7 @@ class BinarySearchTree extends TreeNode {
 		}
 
 		// Recurse again
-		this.traverse(
+		this.traverseV1(
 			cb,
 			nextNode,
 			previousVisited,
@@ -153,6 +153,7 @@ class BinarySearchTree extends TreeNode {
 
 const biSTree = new BinarySearchTree(
 	50, // root
+	// BUG An error happens if the tree is only 50, 25 and 75
 	new BinarySearchTree(
 		25, // left 1
 		new BinarySearchTree(
@@ -160,13 +161,27 @@ const biSTree = new BinarySearchTree(
 			new BinarySearchTree(4), // left 22
 			new BinarySearchTree(11) // right 22
 		),
-		new BinarySearchTree(33) // right 12
+		new BinarySearchTree(
+			33,
+			// BUG why does adding any children here stop the traverseV1 recursion early?
+			new BinarySearchTree(20),
+			new BinarySearchTree(50)
+		) // right 12
 	),
-	new BinarySearchTree(75, new BinarySearchTree(56), new BinarySearchTree(89)) // right 1
+	new BinarySearchTree(
+		75,
+		new BinarySearchTree(
+			56,
+			new BinarySearchTree(52),
+			new BinarySearchTree(61)
+		),
+		new BinarySearchTree(
+			89,
+			new BinarySearchTree(82),
+			new BinarySearchTree(95)
+		)
+	) // right 1
 );
 
-// biSTree.addChild(10, 5);
-
-// console.log(biSTree.rootNode);
-// TODO this should print out in order => 50, 25, 10, 4, 11, 33, 75, 56, 89
-biSTree.traverse(node => console.log(node.data));
+// Traversing the tree should print out in order => 50, 25, 10, 4, 11, 33, 30, 40, 75, 56, 52, 61, 89, 82, 95
+// biSTree.traverseV1(node => console.log(node.data));
