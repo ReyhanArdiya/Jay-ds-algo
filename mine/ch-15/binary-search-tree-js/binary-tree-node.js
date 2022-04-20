@@ -1,4 +1,4 @@
-class TreeNode {
+class BinaryTreeNode {
 	constructor(data, leftChild = null, rightChild = null) {
 		this.leftChild = leftChild;
 		this.data = data;
@@ -6,5 +6,5 @@ class TreeNode {
 	}
 }
 
-export default TreeNode;
+export default BinaryTreeNode;
 

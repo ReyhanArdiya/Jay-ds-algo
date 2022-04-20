@@ -1,12 +1,13 @@
+import BinaryTreeNode from "./binary-tree-node.js";
 import { Stack } from "../../ch-9/stack.js";
-import TreeNode from "./tree-node.js";
+import traverseTree from "../traverse-tree.js";
 
 /**
  * The first data, left and right will be the root
  *
  * @this In this class, `this` will refer to the root node
  */
-class BinarySearchTree extends TreeNode {
+class BinarySearchTree extends BinaryTreeNode {
 	#rootNode = this;
 
 	addChild(data, leftVal = null, rightVal = null) {
@@ -325,14 +326,16 @@ const biSTree5 = new BinarySearchTree(
 
 // Traversing the tree should print out in order => 50, 25, 10, 4, 11, 33, 30, 40, 75, 56, 52, 61, 89, 82, 95
 // biSTree.traverseV1(node => console.log(node.data));
-console.log("=====");
-biSTree.traverseV2(node => console.log(node.data));
-console.log("=====");
-biSTree2.traverseV2(node => console.log(node.data));
-console.log("=====");
-biSTree3.traverseV2(node => console.log(node.data));
-console.log("=====");
-biSTree4.traverseV2(node => console.log(node.data));
-console.log("=====");
-biSTree5.traverseV2(node => console.log(node.data));
-console.log("=====");
+// console.log("=====");
+// biSTree.traverseV2(node => console.log(node.data));
+// console.log("=====");
+// biSTree2.traverseV2(node => console.log(node.data));
+// console.log("=====");
+// biSTree3.traverseV2(node => console.log(node.data));
+// console.log("=====");
+// biSTree4.traverseV2(node => console.log(node.data));
+// console.log("=====");
+// biSTree5.traverseV2(node => console.log(node.data));
+// console.log("=====");
+
+traverseTree(({ data }) => console.log(data), biSTree);
