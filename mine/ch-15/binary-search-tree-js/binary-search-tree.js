@@ -10,38 +10,160 @@ import traverseTree from "../traverse-tree.js";
 class BinarySearchTree extends BinaryTreeNode {
 	#rootNode = this;
 
-	addChild(data, leftVal = null, rightVal = null) {
-		if (leftVal && leftVal >= data) {
-			throw new Error("leftVal must be less than data!");
+	#goToLeftOrRight(data, node) {
+		return data >= node.data ? node.rightChild : node.leftChild;
+	}
+
+	#getAvailableChild(node) {
+		return node.leftChild ? node.leftChild : node.rightChild;
+	}
+
+	/**
+	 *
+	 * @param {BinaryTreeNode | BinarySearchTree} node
+	 *
+	 * @param {boolean} firstTime
+	 */
+	searchSuccessor(node, firstTime = true) {
+		if (!node.leftChild) {
+			return node;
 		}
 
-		if (rightVal && rightVal < data) {
-			throw new Error("rightVal must be more than data!");
+		const nextNode = firstTime ? node.rightChild : node.leftChild;
+		if (firstTime) {
+			firstTime = false;
 		}
 
-		const leftChild = leftVal && new BinarySearchTree(leftVal);
-		const rightChild = rightVal && new BinarySearchTree(rightVal);
-		const childTree = new BinarySearchTree(data, leftChild, rightChild);
-		// console.log(childTree);
+		return this.searchSuccessor(nextNode, firstTime);
+	}
+
+	insert(data, currentNode = this.#rootNode) {
+		// If its bigger, we drill to right
+		if (data >= currentNode.data) {
+			// If right still is a node, we drill into that instead
+			if (currentNode.rightChild) {
+				return this.insert(data, currentNode.rightChild);
+			} else {
+				// If it is null, we just insert it there and stop recursion
+				return currentNode.rightChild = new BinarySearchTree(data);
+			}
+		} else if (data < currentNode.data) {
+			// If its smaller, we drill to left
+			// If left still is a node, we drill into that instead
+			if (currentNode.leftChild) {
+				return this.insert(data, currentNode.leftChild);
+			} else {
+				// If it is null, we just insert it there and stop recursion
+				return currentNode.leftChild = new BinarySearchTree(data);
+			}
+		}
 	}
 
 	search(val, currentNode = this.#rootNode) {
-		if (currentNode.data === val) {
+		// Base case:
+		// 1. is when we found the node we are looking for
+		// 2. is when the currentNode is null which means it is the end of the tree
+		// and we cant go down anymore
+		if (!currentNode || currentNode.data === val) {
 			return currentNode;
 		}
 
-		if (val >= currentNode.data) {
-			currentNode = currentNode.rightChild;
-		} else {
-			currentNode = currentNode.leftChild;
+		return this.search(
+			val,
+			// If val is more or equals to current, we'll search the rightChild
+			// since all of the right ancestor will be more than current so
+			// there is a possibility it is located there; vice-versa for leftChild
+			this.#goToLeftOrRight(val, currentNode)
+		);
+	}
+
+	searchAndGetParent(val, currentNode = this.#rootNode) {
+		if (
+			!currentNode ||
+			currentNode.leftChild.data === val ||
+			currentNode.rightChild.data === val
+		) {
+			return currentNode;
 		}
 
-		// Base case is when the next currentNode is null which means it is the bottom of the tree
-		if (!currentNode) {
-			return null;
+		return this.searchAndGetParent(
+			val,
+			// If val is more or equals to current, we'll search the rightChild
+			// since all of the right ancestor will be more than current so
+			// there is a possibility it is located there; vice-versa for leftChild
+			this.#goToLeftOrRight(val, currentNode)
+		);
+	}
+
+	delete(val, currentNode = this.#rootNode) {
+		/** @type {BinarySearchTree | BinaryTreeNode}*/
+		const toBeDeletedNode = this.search(val, currentNode);
+
+		// If we didn't find the node, return null
+		if (!toBeDeletedNode) {
+			return toBeDeletedNode;
 		}
 
-		return this.search(val, currentNode);
+		// Get the parent of toBeDeletedNode since the way we are deleting it is by
+		// changing the reference to that node from the parent to null
+		const parentOfToBeDeletedNode =
+			toBeDeletedNode === this.#rootNode ?
+				this.#rootNode :
+				this.searchAndGetParent(toBeDeletedNode.data, currentNode);
+
+		// If the tobedeleted doesn't have any child, just delete it
+		if (!toBeDeletedNode.leftChild && !toBeDeletedNode.rightChild) {
+			// Change the parent's reference to that deleted node to null
+			if (
+				parentOfToBeDeletedNode.leftChild.data === toBeDeletedNode.data
+			) {
+				parentOfToBeDeletedNode.leftChild = null;
+			} else {
+				parentOfToBeDeletedNode.rightChild = null;
+			}
+
+			return;
+		}
+
+		// If it has two children
+		if (toBeDeletedNode.leftChild && toBeDeletedNode.rightChild) {
+			// Get the successor of this node
+			const successor = this.searchSuccessor(toBeDeletedNode);
+			const parentOfSuccessor = this.searchAndGetParent(
+				successor.data,
+				currentNode
+			);
+
+			toBeDeletedNode.data = successor.data;
+
+			if (successor.rightChild) {
+				parentOfSuccessor.leftChild = successor.rightChild;
+				successor.rightChild = null;
+			} else if (parentOfSuccessor.leftChild.data === successor.data) {
+				parentOfSuccessor.leftChild = null;
+			} else {
+				parentOfSuccessor.rightChild = null;
+			}
+
+			return;
+		}
+
+		// If it has one children
+		if (toBeDeletedNode.leftChild || toBeDeletedNode.rightChild) {
+			if (toBeDeletedNode.leftChild) {
+				// We delete it by switching their data
+				toBeDeletedNode.data = toBeDeletedNode.leftChild.data;
+
+				// And setting the reference to old leftChild to null => moving it up
+				toBeDeletedNode.leftChild = null;
+			} else {
+				// We delete it by switching their data
+				toBeDeletedNode.data = toBeDeletedNode.rightChild.data;
+
+				// And setting the reference to old rightChild to null => moving it up
+				toBeDeletedNode.rightChild = null;
+			}
+		}
 	}
 
 	traverseV1(
@@ -258,6 +380,59 @@ class BinarySearchTree extends BinaryTreeNode {
 		return this.traverseV2(cb, nextNode, visitedNodes, unfinishedNodes);
 	}
 
+	inorderTraversal(currentNode = this.#rootNode) {
+		if (currentNode.leftChild) {
+			this.inorderTraversal(currentNode.leftChild);
+		}
+
+		console.log(currentNode.data);
+
+		if (currentNode.rightChild) {
+			this.inorderTraversal(currentNode.rightChild);
+		}
+	}
+
+	preorderTraverse(
+		cb = node => console.log(node.data),
+		currentNode = this.#rootNode
+	) {
+		console.log(currentNode.data);
+
+		if (currentNode.leftChild) {
+			this.preorderTraverse(cb, currentNode.leftChild);
+		}
+
+		if (currentNode.rightChild) {
+			this.preorderTraverse(cb, currentNode.rightChild);
+		}
+	}
+
+	postorderTraverse(
+		cb = node => console.log(node.data),
+		currentNode = this.#rootNode
+	) {
+		if (currentNode.leftChild) {
+			this.postorderTraverse(cb, currentNode.leftChild);
+		}
+
+		if (currentNode.rightChild) {
+			this.postorderTraverse(cb, currentNode.rightChild);
+		}
+
+		console.log(currentNode.data);
+	}
+
+	max(currentNode = this.#rootNode) {
+		// Keep drilling to the right child until we find the one that doesn't have rightchild.
+		// The largest number is the bottom-right most node because of how binary search works
+		// (where if the value is greater than current, then search the rightChild)
+		if (!currentNode.rightChild) {
+			return currentNode.data;
+		}
+
+		return this.max(currentNode.rightChild);
+	}
+
 	get rootNode() {
 		return this.#rootNode;
 	}
@@ -320,9 +495,35 @@ const biSTree4 = new BinarySearchTree(
 
 const biSTree5 = new BinarySearchTree(
 	50, // root
-	new BinarySearchTree(25),
+	new BinarySearchTree(25)
 	// new BinarySearchTree()
 );
+
+const biSTreeStr = new BinarySearchTree(
+	"Moby Dick", // root
+	new BinarySearchTree(
+		"Great Expectations",
+		new BinarySearchTree("Alice in Wonderland"),
+		new BinarySearchTree("Lord of the Flies")
+	),
+	new BinarySearchTree(
+		"Robinson Crusoe",
+		new BinarySearchTree("Pride and Prejudice"),
+		new BinarySearchTree("The Odyssey")
+	)
+	// new BinarySearchTree()
+);
+
+// biSTreeStr.inorderTraversal();
+// biSTree.inorderTraversal();
+biSTreeStr.postorderTraverse();
+// console.log(biSTree.max());
+// console.log(biSTreeStr.max());
+
+// biSTreeStr.traverseV2(node => console.log(node.data));
+// console.log("=====");
+// biSTreeStr.delete("Moby Dick");
+// biSTreeStr.traverseV2(node => console.log(node.data));
 
 // Traversing the tree should print out in order => 50, 25, 10, 4, 11, 33, 30, 40, 75, 56, 52, 61, 89, 82, 95
 // biSTree.traverseV1(node => console.log(node.data));
@@ -338,4 +539,56 @@ const biSTree5 = new BinarySearchTree(
 // biSTree5.traverseV2(node => console.log(node.data));
 // console.log("=====");
 
-traverseTree(({ data }) => console.log(data), biSTree);
+// traverseTree(({ data }) => console.log(data), biSTree);
+// console.log(biSTree.search(51));
+// biSTree.addChild(94);
+// biSTree.addChild(96);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// biSTree5.traverseV2();
+// console.log("=====");
+// biSTree5.insert(94);
+// biSTree5.insert(50);
+// biSTree5.insert(93);
+// biSTree5.insert(96);
+// biSTree5.traverseV2();
+
+// /* CMT I follow the explanation starting from page 260 */
+// biSTree.traverseV2(node => console.log(node.data));
+
+// // When deleted node doesnt have any children
+// console.log("===== delete 4");
+// biSTree.delete(4);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// // When deleted node has one child
+// console.log("===== delete 10");
+// biSTree.delete(10);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// // When deleted node has two children
+// console.log("===== delete 56");
+// biSTree.delete(56);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// // When sucessor has right children
+// console.log("===== insert 55");
+// biSTree.insert(55);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// console.log("===== delete 50");
+// biSTree.delete(50);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// // Random
+// console.log("===== delete 25");
+// biSTree.delete(25);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// console.log("===== delete 345");
+// biSTree.delete(345);
+// biSTree.traverseV2(node => console.log(node.data));
+
+// console.log("===== delete 75");
+// biSTree.delete(75);
+// biSTree.traverseV2(node => console.log(node.data));
