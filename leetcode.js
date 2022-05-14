@@ -1,107 +1,30 @@
 /**
- * @param {string[]} strs
+ * @param {number[]} nums
  *
+ * @param {number} target
  *
- * @returns {string}
+ * @returns {number}
  */
-const longestCommonSubStr = strs => {
-	let [ shortestStr ] = strs;
-	for (const str of strs) {
-		if (str.length < shortestStr.length) {
-			shortestStr = str;
+const search = function(nums, target) {
+	let leftBind = 0;
+	let rightBind = nums.length - 1;
+
+	while (leftBind <= rightBind) {
+		const i = Math.floor((rightBind + leftBind) / 2);
+		const current = nums[i];
+
+		if (current < target) {
+			leftBind = i + 1;
+		} else if (current > target) {
+			rightBind = i - 1;
+		} else {
+			return i;
 		}
+
 	}
 
-	let longestSubStr;
-	if (strs.every(str => str.includes(shortestStr))) {
-		longestSubStr = shortestStr;
-
-		return longestSubStr;
-	}
-
-	longestSubStr = "";
-
-	for (let i = shortestStr.length - 1; i >= 0; i--) {
-		const slicedStr = shortestStr.slice(0, i);
-
-		let currentSubStr;
-		if (strs.every(str => str.includes(slicedStr))) {
-			currentSubStr = slicedStr;
-		}
-
-		if (currentSubStr && currentSubStr.length > longestSubStr.length) {
-			longestSubStr = currentSubStr;
-		}
-	}
-
-	for (let i = 0; i < shortestStr.length; i++) {
-		const slicedStr = shortestStr.slice(i);
-
-		let currentSubStr;
-		if (strs.every(str => str.includes(slicedStr))) {
-			currentSubStr = slicedStr;
-		}
-
-		if (currentSubStr && currentSubStr.length > longestSubStr.length) {
-			longestSubStr = currentSubStr;
-		}
-	}
-
-	return longestSubStr;
+	return -1;
 };
 
-/**
- * @param {string[]} strs
- *
- *
- * @returns {string}
- */
-const longestCommonPrefix = strs => {
-	let [ shortestStr ] = strs;
-	for (const str of strs) {
-		if (str.length < shortestStr.length) {
-			shortestStr = str;
-		}
-	}
-
-	let longestPrefix;
-	if (strs.every(str => str.startsWith(shortestStr))) {
-		longestPrefix = shortestStr;
-
-		return longestPrefix;
-	}
-
-	longestPrefix = "";
-
-	for (let i = shortestStr.length - 1; i >= 0; i--) {
-		const slicedStr = shortestStr.slice(0, i);
-
-		let currentSubStr;
-		if (strs.every(str => str.startsWith(slicedStr))) {
-			currentSubStr = slicedStr;
-		}
-
-		if (currentSubStr && currentSubStr.length > longestPrefix.length) {
-			longestPrefix = currentSubStr;
-		}
-	}
-
-	for (let i = 0; i < shortestStr.length; i++) {
-		const slicedStr = shortestStr.slice(i);
-
-		let currentSubStr;
-		if (strs.every(str => str.startsWith(slicedStr))) {
-			currentSubStr = slicedStr;
-		}
-
-		if (currentSubStr && currentSubStr.length > longestPrefix.length) {
-			longestPrefix = currentSubStr;
-		}
-	}
-
-	return longestPrefix;
-};
-
-console.log(longestCommonPrefix([ "flower", "flow", "flight" ]));
-console.log(longestCommonPrefix([ "dog", "racecar", "car" ]));
-// console.log(longestCommonPrefix());
+console.log(search([ -1, 0, 3, 5, 9, 12 ], 12));
+console.log(search([ 5 ], 5));
