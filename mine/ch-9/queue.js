@@ -3,7 +3,8 @@ class Queue {
 
 	/**
 	 * We can pass a list of stuff of make a new Queue from another Queue
-	 * @param  {...any | Queue} items
+	 *
+	 * @param {...any | Queue} items
 	 */
 	constructor(...items) {
 		if (items[0] instanceof Queue) {

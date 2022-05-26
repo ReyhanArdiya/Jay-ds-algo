@@ -1,32 +1,27 @@
-/**
- * @param {number[]} nums
- *
- * @param {number} target
- *
- * @returns {number}
- */
-const searchInsert = (nums, target) => {
-	let leftBind = 0;
-	let rightBind = nums.length - 1;
+const pushZerosToEnd = (arr, n) => {
+	let count = 0; // Count of non-zero elements
 
-	let i = Math.floor((rightBind + leftBind) / 2);
-	let current = nums[i];
-	while (leftBind <= rightBind) {
-		i = Math.floor((rightBind + leftBind) / 2);
-		current = nums[i];
-
-		if (current > target) {
-			rightBind = i - 1;
-		} else if (current < target) {
-			leftBind = i + 1;
-		} else {
-			return i;
+	// Traverse the array. If element encountered is non-
+	// zero, then replace the element at index 'count'
+	// with this element
+	for (let i = 0; i < n; i++) {
+		if (arr[i] !== 0) {
+			arr[count++] = arr[i];
 		}
+	} // here count is
+	// incremented
+
+	// Now all non-zero elements have been shifted to
+	// front and 'count' is set as index of first 0.
+	// Make all elements 0 from count to end.
+	while (count < n) {
+		arr[count++] = 0;
 	}
-
-	i = current > target ? i - 1 : i + 1;
-
-	return i < 0 ? 0 : i;
 };
 
-searchInsert([ 1, 3 ], 2);
+// Driver code
+const arr = [ 1, 9, 8, 4, 0, 0, 2, 7, 0, 6, 0, 9 ];
+const n = arr.length;
+pushZerosToEnd(arr, n);
+
+console.log(arr);
